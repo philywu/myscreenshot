@@ -50,7 +50,7 @@
 	name:"SSImage",
 	
 	bindEvent: function(img){
-		//img.click(evtImgSelect);
+		img.click(evtImgSelect);
 		
 		//img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		img.mousedown(evtImgMD);		
@@ -65,158 +65,30 @@
 		painter.attr({
 			class:"painter"
 		});
-		painter.bindEvent();
+		//painter.bindEvent();
 	},
 	getImg : function() {
 		return (this.select("image"));
 	},
 	addImgSelection : function () {
 		var img = this.getImg();
+		img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		var eleR = SSSelectBox.init(this.paper).draw(this.x,this.y,img.getBBox().w,img.getBBox().h);
 		
 		/*
 		r.attr({
 		filter:"url(#f3)"
 		});
-		*/
-		
+		*/		
 		this.add(eleR);
 		
-	},
+		
+	}
  };
  //Extend class here
  $.extend(true,SSImage,SSElement);
  //override method here
  
-//event methods
-evtImgSelect = function(evt){
-	// set current select to front.
-	console.log("click");
-	evt.stopImmediatePropagation();
-	var g = this.parent();
-	var cvs = g.parent();
-	g.remove();
-	cvs.add(g);
-	
-	//set selected
-	
-	var selected = g.data("selected");
-	var ele1 = SSImage.getElement(g);
-	if (!selected) {
-		// add rectangle		
-			ele1.clearAllSelection();
-			ele1.addImgSelection();
-			g.data("selected",true);
-			this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
-	} else {
-	/*
-		if (!dragged) {			
-			ele1.clearAllSelection();
-			this.undrag();
-		} 
-		*/
-	}
-	
-};
-evtImgDragStart = function () {
-		
-		var g = this.parent();
-		console.log("drag start");
-		if (g.data("selected")) {
-			g.data('origTransform', g.transform().local );
-			
-		}
-		
-	}
-evtImgDragEnd =function (event) {
-		var g = this.parent();
-
-		//check if dragged, keep selection
-		
-		var startPos = g.data("MStartPos");
-		if(!((startPos.mx == event.x) && (startPos.my==event.y))) {
-			
-			this.click(evtImgSelect);
-		}
-		console.log("drag end");
-		
-		g.data('origTransform',undefined);
-	}
-evtImgDragMove = function (dx,dy) {
-		var g = this.parent();
-		
-		if (g.data("selected")) {
-			g.attr({
-					transform: g.data('origTransform') + (g.data('origTransform') ? "T" : "t") + [dx, dy]
-				});
-			
-		}
-		
-	}
-evtImgMU  = function(event) {
-	event.preventDefault();
-	var g = this.parent();
-	var startPos = g.data("MStartPos");
-	var p = getSVGPoint(svgDom,event);
-	this.unclick(evtImgSelect);
-	//console.log(p.x,p.y,startPos.mx,startPos.my);
-	if ((startPos.mx == p.x) && (startPos.my==p.y)) {
-		this.click(evtImgSelect);
-	} 
-	g.data("mousedown",false);
-	//console.log("mouse up");
-}
-evtImgMD  = function(event) {
-	var g = this.parent();
-	event.preventDefault();
-	g.data("mousedown",true);
-	var p = getSVGPoint(svgDom,event);
-	g.data("MStartPos",{"mx":p.x,"my":p.y});
-	
-	if (!g.data("selected")) {
-		
-		var painter = SSPainter.getElement(g.select(".painter"));
-		var box = painter.drawBox(p.x,p.y,0,0);		
-		g.data("currentPainter",box.attr("id"));
-		
-	}
-}
-
-evtImgMM = function (event) {	
-	var d = 5 ;
-	
-	event.preventDefault();
-	var g = this.parent();
-	//console.log(g.data("selected"),g.data("mousedown"));
-	if (!g.data("selected") && g.data("mousedown")) {
-	
-		var startPos = g.data("MStartPos");
-		var p = getSVGPoint(svgDom,event);
-		var w = p.x-startPos.mx;
-		var h = p.y-startPos.my;
-		
-		if (Math.abs(w)>d  || Math.abs(h)>d) {
-			
-			var painter = g.select(".painter");
-			var currentPainter = g.data("currentPainter");			
-			if (currentPainter) {
-				var rect1 = painter.select("#"+currentPainter);							
-				rect1.attr({
-					width:w ,
-					height:h				
-				});
-			}
-			
-		}	
-		//console.log("mouse move",painter);
-	}
-}
-
-
-evtImgMO = function (event) {
-	var g = this.parent();	
-	g.data("mousedown",false);
-}
   /*
  *  Class SSCanvas
  */
@@ -276,6 +148,21 @@ evtImgMO = function (event) {
 		}
 		var list = this.selectAll(shape);		
 		return PType + list.length ; 
+	},
+	getPTypeFromKey:function(ctr,alt,shift) {
+		//get Painter type from input key
+		// H : highligher
+		// R : Rectangle
+		// P : pen
+		var pType ;
+		if (ctr) {
+			pType = 'H';			
+		}else if (alt) {
+			pType = 'R';			
+		} else if (shift) {
+			pType = 'L';
+		}
+		return pType;
 	}
  };
  //Extend class here
@@ -319,11 +206,50 @@ evtImgMO = function (event) {
 
 //SSKeypress
 var SSKeypress = {
+	 ctlPressed: false,
+	 altPressed: false,
+	 shiftPressed: false,
 	keyAction : function (keyCode,paper) {
-		//console.log("key:" ,keyCode);
+		console.log("key:" ,keyCode);
 		switch (keyCode) {
 			case 46: // delete
 				this.deleteCurrent();
+				break;
+		}
+			
+	},
+	keyDown : function (keyCode,paper) {
+		//console.log("key down:" ,keyCode);
+		switch (keyCode) {
+			case 46: // delete
+				this.deleteCurrent();
+				break;
+			case 16: // Shift
+				this.shiftPressed = true;
+				break;
+			case 17: // control
+				this.ctlPressed = true;
+				break;
+			case 18: // Alt
+				this.altPressed = true;
+				break;
+		}
+			
+	},
+	keyUp : function (keyCode,paper) {
+		//console.log("key up:" ,keyCode);		
+		switch (keyCode) {
+			case 46: // delete
+				this.deleteCurrent();
+				break;
+			case 16: // Shift
+				this.shiftPressed = false;
+				break;
+			case 17: // control
+				this.ctlPressed = false;
+				break;
+			case 18: // Alt
+				this.altPressed = false;
 				break;
 		}
 			

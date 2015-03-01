@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html>
+<!-- Snap.SVG drag & drop -->
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+	<style>
+	
+	.rightPanel {
+	float:right;
+	width:9%;
+	border : 1px solid #000;
+	}
+	#mx,#my {
+		width:30px;	
+	}
+	.input-prepend {
+		
+		padding: 20px 5px 10px 5px	;
+		border:none;
+	}
+	input.filename {
+		width:70px;	
+	}
+	#mycanvas {
+		border: 1 solid #000;
+	}
+</style>	
+
+	<script src='./js/jquery-2.1.1.min.js'></script>
+	<script src="./js/snap.svg-min.js"></script>
+	<script src="./js/snap.plugins.js"></script>
+	<script src='./js/paste.js'></script>
+	<script src='./js/Base64.js'></script>		
+	<script  src="./js/Blob.js"></script>
+    <script  src="./js/canvas-toBlob.js"></script>
+    <script src="./js/fileSaver.js"></script>
+ <script src="./js/model.js"></script>
+<script>
+//variable
+			
+			var svg,svgDom, ptSVG,canvas, outputCanvas,pt;
+			
+			
+//Main function
+			$(function() {			
+
+				svg = Snap("#snapshot");
+				//console.log(svg);
+				svgDom = $('#snapshot')[0];
+			    pt = svgDom.createSVGPoint();
+				canvas = SSCanvas.init(svg);
+				canvas.setBackground();
+				
+				outputCanvas = $("#myCanvas");
+				/*
+				outputCanvas.attr({
+					"width":svg.getBBox().w , 
+					"height":svg.getBBox().h
+				});
+				*/
+				//outputCanvas.attr("visible":"none");
+				$("#html-options").on("submit",saveAsSVG);
+				$("#canvas-options").on("submit",saveAsCanvas);
+		});
+		
+		$("html").pasteImageReader(function(results) {
+			  var dataURL, filename;
+			  filename = results.filename, dataURL = results.dataURL;
+			  console.log("paste");
+
+			  var img = document.createElement('img');
+			  img.src= dataURL;
+			  var w = img.width;
+			  var h = img.height;
+			 
+			  //var g = svg.g(svg.rect(10,10,w,h),svg.image(dataURL,10,10,w,h));
+			  var ele = SSImage.init(canvas);
+			  ele.loadImg(dataURL,w,h);
+			// console.log(svg.outerSVG());
+			});
+		
+		$("html").keyup(function(evt) {
+			var charCode = (evt.which) ? evt.which : evt.keyCode
+
+			SSKeypress.keyAction(charCode);
+		});
+		
+		saveAsSVG = function(event) {
+				
+				var html_filename = $('#html-filename');
+				event.preventDefault();
+				var BB = window.Blob,
+				xml_serializer = new XMLSerializer();
+				//var doc = $('#p1').html();
+				//var doc = outerHTML($('#p1'));
+				console.log(svg);
+				var doc = svg.outerSVG();
+				//console.log(doc);
+				saveAs(
+					  new BB(
+						 // [xml_serializer.serializeToString(doc)]
+						 [doc]
+						, {type: "image/svg+xml"}
+					)
+					, (html_filename.attr("value") || html_filename.attr("placeholder"))+ ".svg"
+				);
+			}
+		 saveAsCanvas = function(event) {
+			var canvas_filename = $('#canvas-filename');
+				event.preventDefault();
+				var c = outputCanvas.get(0);
+				
+				var ctx = c.getContext('2d');
+			     var DOMURL = window.URL || window.webkitURL || window;
+				
+				var data = svg.outerSVG();
+				var imgCanvas = new Image();
+			
+				var svgData = new Blob([data], {type: 'image/svg+xml;charset=utf-8'});
+				var url = DOMURL.createObjectURL(svgData);
+				
+				imgCanvas.onload = function () {
+				 // ctx.drawImage(imgCanvas, 0, 0,svg.getBBox().w,svg.getBBox().h,0,0,svg.getBBox().w,svg.getBBox().h);
+				  ctx.drawImage(imgCanvas, 0, 0);
+				  DOMURL.revokeObjectURL(url);
+				  
+				  c.toBlob(function(blob) {
+				saveAs(
+					  blob
+					, (canvas_filename.attr("value") || canvas_filename.attr("placeholder")) + ".png"
+				);
+				
+				}, "image/png");
+				
+				}
+
+				imgCanvas.src = url;
+				console.log(c);
+				
+			};	
+</script>	
+<script>
+		
+		</script>
+				<!-- add sap.ui.table,sap.ui.ux3 and/or other libraries to 'data-sap-ui-libs' if required -->
+<style>
+
+</style>
+	</head>
+	<body >
+<div class="rightPanel">
+<div class="input-prepend">
+  <span class="add-on" >x</span>
+  <input class="span2 type" id="mx" type="text" placeholder="-1">
+  <span class="add-on">y</span>
+  <input class="span2 type" id="my" type="text" placeholder="-1">
+</div>
+<div class="input-prepend">    
+    <form id="canvas-options" >
+            <label>Filename: <br />
+			<input type="text" class="filename" id="canvas-filename" placeholder="screenshot"/>.png</label>
+            <input type="submit" value="->To PNG"/>
+    </form>
+</div>
+<div class="input-prepend">  
+<form id="html-options" >
+            <label>Filename: <br />
+			<input type="text" class="filename" id="html-filename" placeholder="screenshot"/>.svg</label>
+            <input type="submit" value="->To SVG"/>
+        </form>
+</div>		
+
+</div>	
+<div>
+<svg  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="snapshot"  width="1100" 	height="650">
+	<style><![CDATA[
+.highlighter {
+	fill:none;stroke:yellow;stroke-width:15 ; opacity:0.7
+}
+.rectbox{
+	fill:none;stroke:red;stroke-width:2; 
+}
+.currentSelection {
+	fill:none;
+	Stroke:#999;
+	stroke-width:2;
+	
+	
+}
+ ]]></style>
+<defs>
+	<pattern id="Grid"
+                 width="20" height="20"
+                 patternUnits="userSpaceOnUse">
+			<rect x=0 y=0 width=10 height=10 />
+            <rect x=10 y=10 width=10 height=10 />
+            
+     </pattern>
+    <filter id="f3" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+  </defs>
+</svg>
+</div>
+<canvas id="myCanvas" style="border:2px solid black; display:none" width="1100" height="650" ></canvas>
+
+</body>
+</html>
