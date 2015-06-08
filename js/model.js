@@ -50,8 +50,7 @@
 	name:"SSImage",
 	
 	bindEvent: function(img){
-		img.click(evtImgSelect);
-		
+		//img.click(evtImgSelect);		
 		//img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		img.mousedown(evtImgMD);		
 		img.mouseup(evtImgMU);
@@ -72,7 +71,7 @@
 	},
 	addImgSelection : function () {
 		var img = this.getImg();
-		img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
+		//img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		var eleR = SSSelectBox.init(this.paper).draw(this.x,this.y,img.getBBox().w,img.getBBox().h);
 		
 		/*
@@ -114,12 +113,7 @@
  };
  //Extend class here
  $.extend(true,SSCanvas,SSElement);
- //override method here
-// event
- evtCanvasClick = function(evt) {
-	this.clearAllSelection();
- 
- }
+
  ;//end of SSCanvas
  
   /*
@@ -128,18 +122,40 @@
  var SSPainter = {
 	x:0,
 	y:0,
+	boxList:[],
 	bindEvent : function() {
 		this.click(evtPtClick);
 	},
-	drawBox : function (x,y,w,h) {
-		var rect = this.rect(x,y,w,h);
-		var rid = this.genID("R");
-		
-		rect.attr ({
-			class:"rectbox",
-			id:rid
-		});
-		return rect ; 
+	getPainter : function(g) {
+		var painter = this.getElement(g.select(".painter"));
+		//get SSPaintBox list
+		//painter.boxList=[];
+		//var rectboxList = painter.selectAll("rect");
+		//rectboxList.forEach(function(ele){
+		//	var b = SSPaintBox.getElement(ele);
+		//	painter.boxList.push(b);
+		//});
+		return painter;
+	},
+	drawBox : function (x,y,w,h,rid) {
+		if (!rid) {
+		// initial draw
+			var box = SSPaintBox.init(this);
+			box.draw(x,y,w,h,this.genID("R"));		
+			this.boxList.push(box);
+			return box ; 
+		} else {
+		//resize
+			var rect1 = this.select("#"+rid);
+			if (rect1) {
+				rect1.attr({
+					x:x,
+					y:y,
+					width:w ,
+					height:h				
+				});
+			}
+		}
 	},
 	genID :function (PType) {
 		var list,shape,count =0 ;
@@ -176,6 +192,24 @@
  }
  ;//end of SSPainter
  
+ /*
+ *  Class SSPaintBox
+ */
+ var SSPaintBox = {
+	boxId:"",
+	draw: function (x,y,w,h,rid) {
+		var rect = this.rect(x,y,w,h);
+		rect.attr ({
+			class:"rectbox",
+			id:rid
+		});
+		this.boxId = rid;
+	}
+	
+ }
+  //Extend class here
+ $.extend(true,SSPaintBox,SSElement);
+  ;//end of SSPainter
  
    /*
  *  Class SSSelectBox
@@ -200,10 +234,12 @@
  $.extend(true,SSSelectBox,SSElement);
  //override method here
 
- ;//end of SSSelectBox
+ //end of SSSelectBox
 
 //utility
-
+ /*
+ *  Class SSSelectBox
+ */
 //SSKeypress
 var SSKeypress = {
 	 ctlPressed: false,
@@ -233,6 +269,10 @@ var SSKeypress = {
 			case 18: // Alt
 				this.altPressed = true;
 				break;
+			default: 
+				this.shiftPressed = false;
+				this.ctlPressed = false;
+				this.altPressed = false;
 		}
 			
 	},
@@ -265,9 +305,18 @@ var SSKeypress = {
 		});
 	}
 }
+//end of SSKeypress
 
-   getSVGPoint = function(el,evt){
+ /*
+ *  Class SSUtil
+ */
+ var SSUtil = {
+   getSVGPoint :function(el,evt){
 	
-    pt.x = evt.clientX; pt.y = evt.clientY;
-    return pt.matrixTransform(el.getScreenCTM().inverse());
+	var pt1 =  el.createSVGPoint();
+    //pt.x = evt.clientX; pt.y = evt.clientY;
+	pt1.x = evt.clientX; pt1.y = evt.clientY;
+    return pt1.matrixTransform(el.getScreenCTM().inverse());
   }
+}
+//end of SSUtil

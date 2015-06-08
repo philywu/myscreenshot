@@ -1,5 +1,6 @@
 
-//event methods
+//Image event methods
+// click 
 evtImgSelect = function(evt){
 	// set current select to front.
 	console.log("click");
@@ -49,9 +50,21 @@ evtImgDragEnd =function (event) {
 			
 		//	this.click(evtImgSelect);
 		//}
-		console.log("drag end: ");
+		if (g.data("selected")) {
+		 var lm = g.transform().localMatrix ; 
+		 if (lm) {
+			g.data("MRelPos",{"rx":lm.e,"ry":lm.f});
+			
+		 }
+		
+			
+		} else {
+			this.undrag();
+		}
+		console.log("drag end: " );
 		
 		g.data('origTransform',undefined);
+		
 	}
 evtImgDragMove = function (dx,dy) {
 		var g = this.parent();
@@ -67,49 +80,55 @@ evtImgDragMove = function (dx,dy) {
 evtImgMU  = function(event) {
 	event.preventDefault();
 	var g = this.parent();
-	var startPos = g.data("MStartPos");
-	var p = getSVGPoint(svgDom,event);
+	var startPos = g.data("MStartPos");	
+	var p = SSUtil.getSVGPoint(svgDom,event);
+	
 	//this.unclick(evtImgSelect);
-	console.log(p.x,p.y,startPos.mx,startPos.my);
-	//if ((startPos.mx == p.x) && (startPos.my==p.y)) {
-	//	this.click(evtImgSelect);
-	//} 
+	console.log(startPos.mx,startPos.my,p.x,p.y);
+	//console.log(event.clientX, event.clientY);
+	//console.log(g.data("MRelPos").rx, g.data("MRelPos").ry);
+	if ((startPos.mx == p.x) && (startPos.my==p.y)) {
+		this.click(evtImgSelect);
+	} 
+	g.data("MStartPos",undefined);
 	g.data("mousedown",false);
-	//g.data("currentPainter",undefined);
+	g.data("currentPainter",undefined);
 	console.log("mouse up");
 	
 }
 evtImgMD  = function(event) {
-	var g = this.parent();
-	
+	var g = this.parent();	
 	event.preventDefault();
 	g.data("mousedown",true);
-	var p = getSVGPoint(svgDom,event);
+	//coordination convertion
+	var p = SSUtil.getSVGPoint(svgDom,event);
 	g.data("MStartPos",{"mx":p.x,"my":p.y});
 	
-	var painter = SSPainter.getElement(g.select(".painter"));	
+	//var painter = SSPainter.getElement(g.select(".painter"));	
+	var painter = SSPainter.getPainter(g);	
 	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
 	console.log(ptype);
 	if (ptype) {	
 	//paint action
+	// donnot trigger drag or click event if want to do paint.
 		this.undrag();
 		this.unclick(evtImgSelect);
-		
+		// draw initial box;
+		if (ptype == 'R') {	
+			//var painter = SSPainter.getElement(g.select(".painter"));
+			var box = painter.drawBox(p.x,p.y,0,0);		
+			g.data("currentPainter",box.boxId);
+			
+		}
 	} else if (g.data("selected")) {
 	// move action
-		this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
+	// trigger drag event if the image is selected.
+		//this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		
 	} else {
-	// click action
-		this.click(evtImgSelect);
+	
 	}
-	//if (!g.data("selected")) {
-	if (ptype == 'R') {	
-		//var painter = SSPainter.getElement(g.select(".painter"));
-		var box = painter.drawBox(p.x,p.y,0,0);		
-		g.data("currentPainter",box.attr("id"));
-		
-	}
+	
 }
 
 evtImgMM = function (event) {	
@@ -118,25 +137,30 @@ evtImgMM = function (event) {
 	event.preventDefault();
 	var g = this.parent();
 	//console.log(g.data("selected"),g.data("mousedown"));
-	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
+	
 	//if (!g.data("selected") && g.data("mousedown")) {
 	if (g.data("mousedown")) {
+	    var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
 		if (ptype == 'R') {
+		// redraw rectangle.
 			var startPos = g.data("MStartPos");
-			var p = getSVGPoint(svgDom,event);
+			var relPos= g.data("MRelPos");			
+			var p = SSUtil.getSVGPoint(svgDom,event);
 			var w = p.x-startPos.mx;
 			var h = p.y-startPos.my;
-			
-			if (Math.abs(w)>d  || Math.abs(h)>d) {
-				
-				var painter = g.select(".painter");
-				var currentPainter = g.data("currentPainter");			
+					
+			if (Math.abs(w)>d  || Math.abs(h)>d) {							
+				var rectX = (w<0)?p.x:startPos.mx;
+				var rectY = (h<0)?p.y:startPos.my;			
+				if (relPos) {
+					rectX -= relPos.rx;
+					rectY -= relPos.ry;
+				}
+				var currentPainter = g.data("currentPainter");							
 				if (currentPainter) {
-					var rect1 = painter.select("#"+currentPainter);							
-					rect1.attr({
-						width:w ,
-						height:h				
-					});
+					var painter = SSPainter.getPainter(g);
+					painter.drawBox(rectX,rectY,Math.abs(w),Math.abs(h),currentPainter);
+					
 				}
 				
 			}	
@@ -147,6 +171,17 @@ evtImgMM = function (event) {
 
 
 evtImgMO = function (event) {
+	console.log("mouse out", this);
 	var g = this.parent();	
+	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
+	if (!ptype) {	
 	g.data("mousedown",false);
+	}
 }
+
+//
+// event canvas
+ evtCanvasClick = function(evt) {
+	this.clearAllSelection();
+ 
+ }
