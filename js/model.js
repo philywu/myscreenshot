@@ -37,7 +37,11 @@
 		
 
 	},	
-	
+	bringFront: function(g) {		
+		var cvs = g.parent();
+		g.remove();
+		cvs.add(g);
+	},
 	
  };//end of SSElement
  

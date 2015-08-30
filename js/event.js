@@ -6,16 +6,15 @@ evtImgSelect = function(evt){
 	console.log("click");
 	evt.stopImmediatePropagation();
 	var g = this.parent();
-	var cvs = g.parent();
-	g.remove();
-	cvs.add(g);
 	
 	//set selected
 	
 	var selected = g.data("selected");
 	var ele1 = SSImage.getElement(g);
+	ele1.bringFront(g);
 	if (!selected) {
 		// add rectangle		
+			
 			ele1.clearAllSelection();
 			ele1.addImgSelection();
 			g.data("selected",true);
