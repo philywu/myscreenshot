@@ -3,7 +3,7 @@
 // click 
 evtImgSelect = function(evt){
 	// set current select to front.
-	console.log(" this click");
+	console.log("click");
 	evt.stopImmediatePropagation();
 	var g = this.parent();
 	
@@ -12,13 +12,12 @@ evtImgSelect = function(evt){
 	var selected = g.data("selected");
 	var ele1 = SSImage.getElement(g);
 	ele1.bringFront(g);
-	console.log("select: " ,selected);
 	if (!selected) {
 		// add rectangle					
 			ele1.clearAllSelection();
 			ele1.addImgSelection();
 			g.data("selected",true);
-			//this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
+			this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 	} else {
 	/*d
 		if (!dragged) {			
@@ -48,7 +47,6 @@ evtImgDragEnd =function (event) {
 			
 		//	this.click(evtImgSelect);
 		//}
-		
 		if (g.data("selected")) {
 		 var lm = g.transform().localMatrix ; 
 		 if (lm) {
@@ -56,9 +54,8 @@ evtImgDragEnd =function (event) {
 			
 		 }			
 		} else {
-			//this.undrag();
+			this.undrag();
 		}
-		g.data("currentPainter",undefined);
 		console.log("drag end: " );
 		
 		g.data('origTransform',undefined);
@@ -67,7 +64,7 @@ evtImgDragEnd =function (event) {
 evtImgDragMove = function (dx,dy) {
 		var g = this.parent();
 		
-		if (g.data("selected")&& g.data("mode")=="drag") {
+		if (g.data("selected")) {
 			g.attr({
 					transform: g.data('origTransform') + (g.data('origTransform') ? "T" : "t") + [dx, dy]
 				});
@@ -85,7 +82,7 @@ evtImgMU  = function(event) {
 	console.log(startPos.mx,startPos.my,p.x,p.y);
 	
 	if ((startPos.mx == p.x) && (startPos.my==p.y)) {
-		//this.click(evtImgSelect);
+		this.click(evtImgSelect);
 	} 
 	g.data("MStartPos",undefined);
 	g.data("mousedown",false);
@@ -108,8 +105,9 @@ evtImgMD  = function(event) {
 	if (ptype) {	
 	//paint action
 	// donnot trigger drag or click event if want to do paint.
+		this.undrag();
+		this.unclick(evtImgSelect);
 		// draw initial box;
-		g.data("mode","draw");
 		if (ptype == 'R') {	
 			//var painter = SSPainter.getElement(g.select(".painter"));
 			var box = painter.drawBox(p.x,p.y,0,0);		
@@ -120,9 +118,9 @@ evtImgMD  = function(event) {
 	// move action
 	// trigger drag event if the image is selected.
 		//this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
-		g.data("mode","drag");
+		
 	} else {
-		g.data("mode","click");
+	
 	}
 	
 }
@@ -133,10 +131,9 @@ evtImgMM = function (event) {
 	event.preventDefault();
 	var g = this.parent();
 	//console.log(g.data("selected"),g.data("mousedown"));
-	var mode = g.data("mode");
 	
 	//if (!g.data("selected") && g.data("mousedown")) {
-	if (mode =="draw" && g.data("mousedown")) {
+	if (g.data("mousedown")) {
 	    var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
 		if (ptype == 'R') {
 		// redraw rectangle.
@@ -153,8 +150,7 @@ evtImgMM = function (event) {
 					rectX -= relPos.rx;
 					rectY -= relPos.ry;
 				}
-				var currentPainter = g.data("currentPainter");		
-				
+				var currentPainter = g.data("currentPainter");							
 				if (currentPainter) {
 					var painter = SSPainter.getPainter(g);
 					painter.drawBox(rectX,rectY,Math.abs(w),Math.abs(h),currentPainter);

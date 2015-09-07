@@ -27,10 +27,12 @@
 			imageG = ele.parent();
 			imageG.data("selected",false);
 			var img1 = imageG.select("image");
+			/*
 			if (img1) {
 				img1.undrag();
 				img1.unclick();
 			}
+			*/
 			//remove rectangle
 			ele.remove();
 		});
@@ -54,8 +56,8 @@
 	name:"SSImage",
 	
 	bindEvent: function(img){
-		//img.click(evtImgSelect);		
-		//img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
+		img.click(evtImgSelect);		
+		img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		img.mousedown(evtImgMD);		
 		img.mouseup(evtImgMU);
 		img.mousemove(evtImgMM);
@@ -174,7 +176,7 @@
 		// H : highligher
 		// R : Rectangle
 		// P : pen
-		var pType ;
+		var pType ='' ;
 		if (ctr) {
 			pType = 'H';			
 		}else if (alt) {
