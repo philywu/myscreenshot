@@ -163,10 +163,27 @@
 			}
 		}
 	},
+	highlight : function (x,y,hid,x0,y0) {
+		if (!hid) {
+			var highlighter = SSHighligher.init(this);			
+			highlighter.draw(x,y,x,y,this.genID("H")); 
+			return highlighter ; 
+		} else {
+			var hl = this.select("#"+hid);
+			var pt=SSHighligher.genPath(x0,y0,x,y);					
+			hl.attr({
+				path:pt
+			});
+			
+		}
+	},
 	genID :function (PType) {
 		var list,shape,count =0 ;
 		switch (PType) {
-			case "R": shape = "rect" ;
+			case "R": shape = "rect";
+				break ;
+			case "H" : shape= "path" ;
+				break;
 		}
 		var list = this.selectAll(shape);		
 		return PType + list.length ; 
@@ -215,6 +232,28 @@
  }
   //Extend class here
  $.extend(true,SSPaintBox,SSElement);
+  ;//end of SSPainter
+ 
+ /*
+ *  Class SSHighligher
+ */
+ var SSHighligher = {
+	hId:"",
+	draw: function (x,y,x1,y1,hid) {		
+		var path = this.path(this.genPath(x,y,x1,y1));
+		path.attr ({
+			class:"highlighter",
+			id:hid
+		});
+		this.hId = hid;
+	},
+	genPath(x,y,x1,y1) {
+		return 'M' + x +','+y+'L'+x1 +','+y1; 
+	}
+	
+ }
+  //Extend class here
+ $.extend(true,SSHighligher,SSElement);
   ;//end of SSPainter
  
    /*

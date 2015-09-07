@@ -51,14 +51,17 @@ evtImgDragEnd =function (event) {
 		
 		if (g.data("selected")) {
 		 var lm = g.transform().localMatrix ; 
+		 /*
 		 if (lm) {
 			g.data("MRelPos",{"rx":lm.e,"ry":lm.f});
 			
-		 }			
+		 }	
+		 */
 		} else {
 			//this.undrag();
 		}
 		g.data("currentPainter",undefined);
+		g.data("mode",undefined);
 		console.log("drag end: " );
 		
 		g.data('origTransform',undefined);
@@ -81,15 +84,31 @@ evtImgMU  = function(event) {
 	var startPos = g.data("MStartPos");	
 	var p = SSUtil.getSVGPoint(svgDom,event);
 	
-	//this.unclick(evtImgSelect);
-	console.log(startPos.mx,startPos.my,p.x,p.y);
+	//console.log(startPos.mx,startPos.my,p.x,p.y);
 	
-	if ((startPos.mx == p.x) && (startPos.my==p.y)) {
-		//this.click(evtImgSelect);
-	} 
+	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
+	//console.log(ptype);
+	var painter = SSPainter.getPainter(g);
+	
+	if (ptype) {
+		if (ptype == 'H') {	
+			var d = "M " + startPos.mx + "," +startPos.my + "L " + p.x + "," + p.y +"Z";
+			console.log(d);
+			//SSPainter.highlight(startPos.mx, startPos.my);
+			/*
+			var p = painter.path(d);
+			p.attr( {
+				class:"highlighter"
+			});			
+			*/
+		}
+	}
+	
+	
 	g.data("MStartPos",undefined);
 	g.data("mousedown",false);
 	g.data("currentPainter",undefined);
+	g.data("mode",undefined);
 	console.log("mouse up");
 	
 }
@@ -100,7 +119,7 @@ evtImgMD  = function(event) {
 	//coordination convertion
 	var p = SSUtil.getSVGPoint(svgDom,event);
 	g.data("MStartPos",{"mx":p.x,"my":p.y});
-	console.log("mouse down");
+	console.log("mouse down",p.x,p.y);
 	//var painter = SSPainter.getElement(g.select(".painter"));	
 	var painter = SSPainter.getPainter(g);	
 	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
@@ -114,6 +133,12 @@ evtImgMD  = function(event) {
 			//var painter = SSPainter.getElement(g.select(".painter"));
 			var box = painter.drawBox(p.x,p.y,0,0);		
 			g.data("currentPainter",box.boxId);
+			
+		}
+		if (ptype == 'H') {	
+			//var painter = SSPainter.getElement(g.select(".painter"));
+			var highlighter = painter.highlight(p.x,p.y);		
+			g.data("currentPainter",highlighter.hId);
 			
 		}
 	} else if (g.data("selected")) {
@@ -138,31 +163,45 @@ evtImgMM = function (event) {
 	//if (!g.data("selected") && g.data("mousedown")) {
 	if (mode =="draw" && g.data("mousedown")) {
 	    var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
-		if (ptype == 'R') {
-		// redraw rectangle.
-			var startPos = g.data("MStartPos");
-			var relPos= g.data("MRelPos");			
+		if (ptype) {
 			var p = SSUtil.getSVGPoint(svgDom,event);
-			var w = p.x-startPos.mx;
-			var h = p.y-startPos.my;
-					
-			if (Math.abs(w)>d  || Math.abs(h)>d) {							
-				var rectX = (w<0)?p.x:startPos.mx;
-				var rectY = (h<0)?p.y:startPos.my;			
+			var startPos = g.data("MStartPos");
+			
+			var currentPainter = g.data("currentPainter");		
+			if (ptype == 'R') {
+			// redraw rectangle.
+				//var startPos = g.data("MStartPos");
+				var relPos= g.data("MRelPos");			
+				
+				var w = p.x-startPos.mx;
+				var h = p.y-startPos.my;
+						
+				if (Math.abs(w)>d  || Math.abs(h)>d) {							
+					var rectX = (w<0)?p.x:startPos.mx;
+					var rectY = (h<0)?p.y:startPos.my;			
+					/*
 				if (relPos) {
-					rectX -= relPos.rx;
-					rectY -= relPos.ry;
-				}
-				var currentPainter = g.data("currentPainter");		
-				
-				if (currentPainter) {
-					var painter = SSPainter.getPainter(g);
-					painter.drawBox(rectX,rectY,Math.abs(w),Math.abs(h),currentPainter);
+						rectX -= relPos.rx;
+						rectY -= relPos.ry;
+					}
+					*/
+					//console.log (startPos.mx,startPos.my,rectX,rectY);
+					if (currentPainter) {
+						var painter = SSPainter.getPainter(g);
+						painter.drawBox(rectX,rectY,Math.abs(w),Math.abs(h),currentPainter);
+						
+					}
 					
-				}
-				
-			}	
-			//console.log("mouse move",painter);
+				}	
+				//console.log("mouse move",painter);
+			}
+			if (ptype == 'H') {				
+				if (currentPainter) {
+						var painter = SSPainter.getPainter(g);
+						painter.highlight(p.x,p.y,currentPainter,startPos.mx,startPos.my);
+						
+					}
+			}
 		}
 	}
 }
