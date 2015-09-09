@@ -51,12 +51,12 @@ evtImgDragEnd =function (event) {
 		
 		if (g.data("selected")) {
 		 var lm = g.transform().localMatrix ; 
-		 /*
+		 
 		 if (lm) {
 			g.data("MRelPos",{"rx":lm.e,"ry":lm.f});
 			
 		 }	
-		 */
+		 
 		} else {
 			//this.undrag();
 		}
@@ -166,12 +166,12 @@ evtImgMM = function (event) {
 		if (ptype) {
 			var p = SSUtil.getSVGPoint(svgDom,event);
 			var startPos = g.data("MStartPos");
-			
+			var relPos= g.data("MRelPos");			
 			var currentPainter = g.data("currentPainter");		
 			if (ptype == 'R') {
 			// redraw rectangle.
 				//var startPos = g.data("MStartPos");
-				var relPos= g.data("MRelPos");			
+				
 				
 				var w = p.x-startPos.mx;
 				var h = p.y-startPos.my;
@@ -179,12 +179,12 @@ evtImgMM = function (event) {
 				if (Math.abs(w)>d  || Math.abs(h)>d) {							
 					var rectX = (w<0)?p.x:startPos.mx;
 					var rectY = (h<0)?p.y:startPos.my;			
-					/*
+					
 				if (relPos) {
 						rectX -= relPos.rx;
 						rectY -= relPos.ry;
 					}
-					*/
+					
 					//console.log (startPos.mx,startPos.my,rectX,rectY);
 					if (currentPainter) {
 						var painter = SSPainter.getPainter(g);
@@ -198,7 +198,18 @@ evtImgMM = function (event) {
 			if (ptype == 'H') {				
 				if (currentPainter) {
 						var painter = SSPainter.getPainter(g);
-						painter.highlight(p.x,p.y,currentPainter,startPos.mx,startPos.my);
+						
+						var x0 = startPos.mx;
+						var y0 = startPos.my;
+						var x1 = p.x;
+						var y1 = p.y;
+						if (relPos) {
+							x0 = startPos.mx - relPos.rx;
+							y0 = startPos.my - relPos.ry;
+							x1 = p.x - relPos.rx;
+							y1 = p.y - relPos.ry;
+						}
+						painter.highlight(x1,y1,currentPainter,x0,y0);
 						
 					}
 			}
