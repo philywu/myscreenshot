@@ -89,22 +89,7 @@ evtImgMU  = function(event) {
 	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
 	//console.log(ptype);
 	var painter = SSPainter.getPainter(g);
-	/*
-	if (ptype) {
-		if (ptype == 'H') {	
-			var d = "M " + startPos.mx + "," +startPos.my + "L " + p.x + "," + p.y +"Z";
-			console.log(d);
-			//SSPainter.highlight(startPos.mx, startPos.my);
-			
-			var p = painter.path(d);
-			p.attr( {
-				class:"highlighter"
-			});			
-			
-		}
-	}
-	*/
-	
+
 	g.data("MStartPos",undefined);
 	g.data("mousedown",false);
 	g.data("currentPainter",undefined);
@@ -118,11 +103,14 @@ evtImgMD  = function(event) {
 	g.data("mousedown",true);
 	//coordination convertion
 	var p = SSUtil.getSVGPoint(svgDom,event);
-	g.data("MStartPos",{"mx":p.x,"my":p.y});
+	var relPos= g.data("MRelPos");		
+	var startPos = {"mx":p.x,"my":p.y};	
+	g.data("MStartPos",startPos);
 	console.log("mouse down",p.x,p.y);
 	//var painter = SSPainter.getElement(g.select(".painter"));	
 	var painter = SSPainter.getPainter(g);	
 	var ptype = SSPainter.getPTypeFromKey(SSKeypress.ctlPressed,SSKeypress.altPressed,SSKeypress.shiftPressed);
+	var pt0 = SSUtil.getConvertPoint(startPos,relPos);
 	//console.log(ptype);
 	if (ptype) {	
 	//paint action
@@ -131,20 +119,20 @@ evtImgMD  = function(event) {
 		g.data("mode","draw");
 		if (ptype == 'R') {	
 			//var painter = SSPainter.getElement(g.select(".painter"));
-			var box = painter.drawBox(p.x,p.y,0,0);		
+			var box = painter.drawBox(pt0.x,pt0.y,0,0);		
 			g.data("currentPainter",box.boxId);
 			
 		}
 		if (ptype == 'H') {	
 			//var painter = SSPainter.getElement(g.select(".painter"));
-			var highlighter = painter.highlight(p.x,p.y);		
-			g.data("currentPainter",highlighter.hId);
+			var highlighter = painter.highlight(pt0.x,pt0.y);		
+			g.data("currentPainter",highlighter.id);
 			
 		}
 		if (ptype == 'A') {	
 			//var painter = SSPainter.getElement(g.select(".painter"));
-			var arrowLine = painter.arrowline(p.x,p.y);		
-			g.data("currentPainter",arrowLine.aId);
+			var arrowLine = painter.arrowline(pt0.x,pt0.y);		
+			g.data("currentPainter",arrowLine.id);
 			
 		}
 	} else if (g.data("selected")) {
@@ -174,6 +162,8 @@ evtImgMM = function (event) {
 			var startPos = g.data("MStartPos");
 			var relPos= g.data("MRelPos");			
 			var currentPainter = g.data("currentPainter");		
+			var pt0 = SSUtil.getConvertPoint(startPos,relPos);
+			var pt1 = SSUtil.getConvertPoint(p,relPos);
 			if (ptype == 'R') {
 			// redraw rectangle.
 				//var startPos = g.data("MStartPos");
@@ -183,18 +173,15 @@ evtImgMM = function (event) {
 				var h = p.y-startPos.my;
 						
 				if (Math.abs(w)>d  || Math.abs(h)>d) {							
-					var rectX = (w<0)?p.x:startPos.mx;
-					var rectY = (h<0)?p.y:startPos.my;			
+					pt0.x = (w<0)?p.x:startPos.mx;
+					pt0.y = (h<0)?p.y:startPos.my;			
 					
-				if (relPos) {
-						rectX -= relPos.rx;
-						rectY -= relPos.ry;
-					}
-					
+					pt0 = SSUtil.getConvertPoint(pt0,relPos);
+						
 					//console.log (startPos.mx,startPos.my,rectX,rectY);
 					if (currentPainter) {
 						var painter = SSPainter.getPainter(g);
-						painter.drawBox(rectX,rectY,Math.abs(w),Math.abs(h),currentPainter);
+						painter.drawBox(pt0.x,pt0.y,Math.abs(w),Math.abs(h),currentPainter);
 						
 					}
 					
@@ -203,38 +190,15 @@ evtImgMM = function (event) {
 			}
 			if (ptype == 'H') {				
 				if (currentPainter) {
-						var painter = SSPainter.getPainter(g);
-						
-						var x0 = startPos.mx;
-						var y0 = startPos.my;
-						var x1 = p.x;
-						var y1 = p.y;
-						if (relPos) {
-							x0 = startPos.mx - relPos.rx;
-							y0 = startPos.my - relPos.ry;
-							x1 = p.x - relPos.rx;
-							y1 = p.y - relPos.ry;
-						}
-						painter.highlight(x1,y1,currentPainter,x0,y0);
+						var painter = SSPainter.getPainter(g);														
+						painter.highlight(pt1.x,pt1.y,currentPainter,pt0.x,pt0.y);
 						
 					}
 			}
 			if (ptype == 'A') {				
 				if (currentPainter) {
-						var painter = SSPainter.getPainter(g);
-						
-						var x0 = startPos.mx;
-						var y0 = startPos.my;
-						var x1 = p.x;
-						var y1 = p.y;
-						if (relPos) {
-							x0 = startPos.mx - relPos.rx;
-							y0 = startPos.my - relPos.ry;
-							x1 = p.x - relPos.rx;
-							y1 = p.y - relPos.ry;
-						}
-						painter.arrowline(x1,y1,currentPainter,x0,y0);
-						
+						var painter = SSPainter.getPainter(g);														
+						painter.arrowline(pt1.x,pt1.y,currentPainter,pt0.x,pt0.y);												
 					}
 			}
 		}

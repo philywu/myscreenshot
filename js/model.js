@@ -163,10 +163,10 @@
 			}
 		}
 	},
-	highlight : function (x,y,hid,x0,y0) {
+	highlight : function (x,y,hid,x0,y0) {		
 		if (!hid) {
 			var highlighter = SSHighligher.init(this);			
-			highlighter.draw(x,y,x,y,this.genID("H")); 
+			highlighter.draw(x,y,x,y,this.genID(SSHighligher.identifier)); 
 			return highlighter ; 
 		} else {
 			var hl = this.select("#"+hid);
@@ -180,7 +180,7 @@
 	arrowline : function (x,y,aid,x0,y0) {
 		if (!aid) {
 			var arrowLine = SSArrowLine.init(this);			
-			arrowLine.draw(x,y,x,y,this.genID("A")); 
+			arrowLine.draw(x,y,x,y,this.genID(SSArrowLine.identifier)); 
 			return arrowLine ; 
 		} else {
 			var al = this.select("#"+aid);
@@ -252,17 +252,17 @@
   ;//end of SSPainter
  
  /*
- *  Class SSHighligher
+ *  Class SSPath
  */
- var SSHighligher = {
-	hId:"",
-	draw: function (x,y,x1,y1,hid) {		
+ var SSPath = {
+	id:"",
+	draw: function (x,y,x1,y1,pid) {			
 		var path = this.path(this.genPath(x,y,x1,y1));
 		path.attr ({
-			class:"highlighter",
-			id:hid
+			class:this.cssClass,
+			id:pid
 		});
-		this.hId = hid;
+		this.id = pid;
 	},
 	genPath(x,y,x1,y1) {
 		return 'M' + x +','+y+'L'+x1 +','+y1; 
@@ -270,29 +270,32 @@
 	
  }
   //Extend class here
- $.extend(true,SSHighligher,SSElement);
+ $.extend(true,SSPath,SSElement);
+  ;//end of SSPath
+ 
+ 
+ /*
+ *  Class SSHighligher
+ */
+ var SSHighligher = {
+	//hId:"",
+	identifier :"H",
+	cssClass :"highlighter"
+	
+ }
+  //Extend class here
+ $.extend(true,SSHighligher,SSPath);
   ;//end of SSHighligher
  
   /*
  *  Class SSArrowLine
  */
  var SSArrowLine = {
-	aId:"",
-	draw: function (x,y,x1,y1,aid) {		
-		var path = this.path(this.genPath(x,y,x1,y1));
-		path.attr ({
-			class:"arrowline",
-			id:aid
-		});
-		this.aId = aid;
-	},
-	genPath(x,y,x1,y1) {
-		return 'M' + x +','+y+'L'+x1 +','+y1; 
-	}
-	
+	identifier :"A",
+	cssClass : "arrowline"
  }
   //Extend class here
- $.extend(true,SSArrowLine,SSElement);
+ $.extend(true,SSArrowLine,SSPath);
   ;//end of SSArrowLine
  
    /*
@@ -401,6 +404,22 @@ var SSKeypress = {
     //pt.x = evt.clientX; pt.y = evt.clientY;
 	pt1.x = evt.clientX; pt1.y = evt.clientY;
     return pt1.matrixTransform(el.getScreenCTM().inverse());
+  },
+  getConvertPoint : function(pt,relPt) {
+		var valPt = {x:0,y:0};
+		if (pt.mx) { // startPos
+			valPt.x = pt.mx;
+			valPt.y = pt.my;
+		} else { // SVGPoint
+			valPt.x = pt.x;
+			valPt.y = pt.y;
+		}
+		if (relPt) {
+			valPt.x -= relPt.rx ; 
+			valPt.y -= relPt.ry ; 
+		} 
+		return valPt;
+		
   }
 }
 //end of SSUtil
