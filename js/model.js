@@ -177,12 +177,28 @@
 			
 		}
 	},
+	arrowline : function (x,y,aid,x0,y0) {
+		if (!aid) {
+			var arrowLine = SSArrowLine.init(this);			
+			arrowLine.draw(x,y,x,y,this.genID("A")); 
+			return arrowLine ; 
+		} else {
+			var al = this.select("#"+aid);
+			var pt=SSArrowLine.genPath(x0,y0,x,y);					
+			al.attr({
+				path:pt
+			});
+			
+		}
+	},
 	genID :function (PType) {
 		var list,shape,count =0 ;
 		switch (PType) {
 			case "R": shape = "rect";
 				break ;
 			case "H" : shape= "path" ;
+				break;
+			case "A" : shape= "path" ;
 				break;
 		}
 		var list = this.selectAll(shape);		
@@ -193,13 +209,14 @@
 		// H : highligher
 		// R : Rectangle
 		// P : pen
+		// A : Arrow
 		var pType ='' ;
 		if (ctr) {
-			pType = 'H';			
+			pType = 'A';			
 		}else if (alt) {
 			pType = 'R';			
 		} else if (shift) {
-			pType = 'L';
+			pType = 'H';
 		}
 		return pType;
 	}
@@ -254,7 +271,29 @@
  }
   //Extend class here
  $.extend(true,SSHighligher,SSElement);
-  ;//end of SSPainter
+  ;//end of SSHighligher
+ 
+  /*
+ *  Class SSArrowLine
+ */
+ var SSArrowLine = {
+	aId:"",
+	draw: function (x,y,x1,y1,aid) {		
+		var path = this.path(this.genPath(x,y,x1,y1));
+		path.attr ({
+			class:"arrowline",
+			id:aid
+		});
+		this.aId = aid;
+	},
+	genPath(x,y,x1,y1) {
+		return 'M' + x +','+y+'L'+x1 +','+y1; 
+	}
+	
+ }
+  //Extend class here
+ $.extend(true,SSArrowLine,SSElement);
+  ;//end of SSArrowLine
  
    /*
  *  Class SSSelectBox

@@ -185,6 +185,9 @@
 .highlighter {
 	fill:none;stroke:yellow;stroke-width:15 ; opacity:0.7
 }
+.arrowline {
+	fill:none;stroke:red;stroke-width:3 ;marker-end:url(#markerArrow) ; 
+}
 .rectbox{
 	fill:none;stroke:red;stroke-width:2; 
 }
@@ -209,6 +212,19 @@
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
       <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
     </filter>
+	<marker id="markerArrow" markerWidth="6" markerHeight="6" refX="2" refY="4"
+           orient="auto">
+        <path d="M2,2 L2,6 L5,4 L2,2" style="fill: #FF0000;" />
+    </marker>
+</defs>
+
+<path d="M100,10 L150,10 L150,60"
+      style="stroke: #6666ff; stroke-width: 1px; fill: none;
+                   marker-start: url(#markerCircle);
+                   marker-end: url(#markerArrow);
+                 "
+
+        />
   </defs>
 </svg>
 </div>
