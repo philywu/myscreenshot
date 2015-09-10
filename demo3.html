@@ -156,29 +156,7 @@
 </style>
 	</head>
 	<body >
-<div class="rightPanel">
-<div class="input-prepend">
-  <span class="add-on" >x</span>
-  <input class="span2 type" id="mx" type="text" placeholder="-1">
-  <span class="add-on">y</span>
-  <input class="span2 type" id="my" type="text" placeholder="-1">
-</div>
-<div class="input-prepend">    
-    <form id="canvas-options" >
-            <label>Filename: <br />
-			<input type="text" class="filename" id="canvas-filename" placeholder="screenshot"/>.png</label>
-            <input type="submit" value="->To PNG"/>
-    </form>
-</div>
-<div class="input-prepend">  
-<form id="html-options" >
-            <label>Filename: <br />
-			<input type="text" class="filename" id="html-filename" placeholder="screenshot"/>.svg</label>
-            <input type="submit" value="->To SVG"/>
-        </form>
-</div>		
-
-</div>	
+	
 <div>
 <svg  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="snapshot"  width="1100" 	height="650">
 	<style><![CDATA[
@@ -195,7 +173,10 @@
 	fill:none;
 	Stroke:#999;
 	stroke-width:2;
-	
+.textselect {	
+	color: #FF0000;
+	border: 1px #000 solid ; 
+}	
 	
 }
  ]]></style>
@@ -229,6 +210,28 @@
 </svg>
 </div>
 <canvas id="myCanvas" style="border:2px solid black; display:none" width="1100" height="650" ></canvas>
+<div class="rightPanel" style="">
+<div class="input-prepend">
+  <span class="add-on" >x</span>
+  <input class="span2 type" id="mx" type="text" placeholder="-1">
+  <span class="add-on">y</span>
+  <input class="span2 type" id="my" type="text" placeholder="-1">
+</div>
+<div class="input-prepend">    
+    <form id="canvas-options" >
+            <label>Filename: <br />
+			<input type="text" class="filename" id="canvas-filename" placeholder="screenshot"/>.png</label>
+            <input type="submit" value="->To PNG"/>
+    </form>
+</div>
+<div class="input-prepend">  
+<form id="html-options" >
+            <label>Filename: <br />
+			<input type="text" class="filename" id="html-filename" placeholder="screenshot"/>.svg</label>
+            <input type="submit" value="->To SVG"/>
+        </form>
+</div>		
 
+</div>
 </body>
 </html>

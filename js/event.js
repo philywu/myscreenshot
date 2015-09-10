@@ -214,10 +214,27 @@ evtImgMO = function (event) {
 	g.data("mousedown",false);
 	}
 }
-
+evtImgDblClick = function(event) {
+	console.log("double click here");
+	var g = this.parent();
+	var selected = g.data("selected");
+	var ele1 = SSImage.getElement(g);
+	//clear current selection for image
+	ele1.clearAllSelection();
+	// add text
+	var painter = SSPainter.getPainter(g);		
+	var p = SSUtil.getSVGPoint(svgDom,event);
+	var relPos= g.data("MRelPos");	
+	var pt1 = SSUtil.getConvertPoint(p,relPos);
+	painter.writeText(pt1.x,pt1.y,"hello mate");
+}
 //
 // event canvas
  evtCanvasClick = function(evt) {
 	this.clearAllSelection();
  
+ }
+ //event Text
+ evtTextClick = function(evt) {
+	console.log("text click");
  }

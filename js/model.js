@@ -57,6 +57,7 @@
 	
 	bindEvent: function(img){
 		img.click(evtImgSelect);		
+		img.dblclick(evtImgDblClick);
 		img.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
 		img.mousedown(evtImgMD);		
 		img.mouseup(evtImgMU);
@@ -191,6 +192,11 @@
 			
 		}
 	},
+	writeText : function(x,y,text,tid) {
+		var eleText = SSText.init(this);
+		eleText.write(x,y,text,this.genID(SSText.identifier));
+		return eleText ;
+	},
 	genID :function (PType) {
 		var list,shape,count =0 ;
 		switch (PType) {
@@ -200,6 +206,9 @@
 				break;
 			case "A" : shape= "path" ;
 				break;
+			case "T" : shape ="text" ;
+				break;
+			
 		}
 		var list = this.selectAll(shape);		
 		return PType + list.length ; 
@@ -297,6 +306,31 @@
   //Extend class here
  $.extend(true,SSArrowLine,SSPath);
   ;//end of SSArrowLine
+ 
+ /*
+ *  Class SSPath
+ */
+ var SSText = {
+	id:"",
+	cssClass:"textselect",
+	write: function (x,y,text,tid) {			
+		var txt = this.text(x,y,text);
+		txt.attr ({
+			class:this.cssClass,
+			id:tid
+		});
+		this.id = tid;
+		this.bindEvent();
+	},
+	bindEvent : function() {
+		this.click(evtTextClick);
+	}
+	
+	
+ }
+  //Extend class here
+ $.extend(true,SSText,SSElement);
+  ;//end of SSText
  
    /*
  *  Class SSSelectBox
