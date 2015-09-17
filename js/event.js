@@ -226,7 +226,8 @@ evtImgDblClick = function(event) {
 	var p = SSUtil.getSVGPoint(svgDom,event);
 	var relPos= g.data("MRelPos");	
 	var pt1 = SSUtil.getConvertPoint(p,relPos);
-	painter.writeText(pt1.x,pt1.y,"hello mate");
+	//painter.writeText(pt1.x,pt1.y,"hello mate");
+	painter.showTextEditor(pt1.x,pt1.y);
 }
 //
 // event canvas
@@ -237,4 +238,22 @@ evtImgDblClick = function(event) {
  //event Text
  evtTextClick = function(evt) {
 	console.log("text click");
+ }
+ evtTextEditorBlur = function(evt) {
+	console.log("text blur");
+	//var g = this.parent();
+	var input = $(this);
+	var fo = input.parent();
+	var g = fo.parent(); // the g of foreign object
+	var pg = g.parent();
+	var painter = SSPainter.getPainter(pg);		
+	var x = fo.attr("x");
+	var y = fo.attr("y");
+	
+	y = parseInt(y) + 15 ; //adjust the position
+	console.log(x,y);
+	painter.writeText(x,y,this.value);
+	g.remove();
+	
+	
  }

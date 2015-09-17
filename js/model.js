@@ -195,7 +195,17 @@
 	writeText : function(x,y,text,tid) {
 		var eleText = SSText.init(this);
 		eleText.write(x,y,text,this.genID(SSText.identifier));
+		
 		return eleText ;
+	},
+	showTextEditor: function(x,y) {
+					
+			var eleText = SSText.init(this);
+			eleText.showEditor(x,y,this.genID(SSText.identifier));
+			//$.extend(fo,this.g());
+			//this.append(fo);
+			//console.log(fo);
+	
 	},
 	genID :function (PType) {
 		var list,shape,count =0 ;
@@ -311,6 +321,7 @@
  *  Class SSPath
  */
  var SSText = {
+	identifier :"T",
 	id:"",
 	cssClass:"textselect",
 	write: function (x,y,text,tid) {			
@@ -324,6 +335,25 @@
 	},
 	bindEvent : function() {
 		this.click(evtTextClick);
+	},
+	showEditor(x,y) {
+		var foVal = '<foreignObject width="200" height="150"><input type="text" id="textEditor" value=""/></foreignObject>';
+		var fragFO = Snap.parse(foVal);	
+		var fo = fragFO.select("foreignObject");
+		
+		fo.attr({
+			x:x,
+			y:y		
+		});
+		var input = fo.select("input");
+		$(input.node).blur(evtTextEditorBlur);
+		
+		
+		this.append(fo);
+		//input.node.on("blur",evtTextEditorBlur);
+		input.node.focus();
+		
+		//console.log(fo,input);
 	}
 	
 	

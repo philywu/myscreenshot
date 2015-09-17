@@ -173,12 +173,14 @@
 	fill:none;
 	Stroke:#999;
 	stroke-width:2;
+}
 .textselect {	
-	color: #FF0000;
-	border: 1px #000 solid ; 
+	color:red;
+	fill: currentColor;
+	
 }	
 	
-}
+
  ]]></style>
 <defs>
 	<pattern id="Grid"
@@ -198,15 +200,7 @@
         <path d="M2,2 L2,6 L5,4 L2,2" style="fill: #FF0000;" />
     </marker>
 </defs>
-
-<path d="M100,10 L150,10 L150,60"
-      style="stroke: #6666ff; stroke-width: 1px; fill: none;
-                   marker-start: url(#markerCircle);
-                   marker-end: url(#markerArrow);
-                 "
-
-        />
-  </defs>
+ 
 </svg>
 </div>
 <canvas id="myCanvas" style="border:2px solid black; display:none" width="1100" height="650" ></canvas>

@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+<!-- add g and switch drag to transform, introduce Snap.SVG back-->
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+	<style>
+	.myselected {
+	border:3px solid red;
+}
+</style>	
+<script src='./js/jquery-2.1.1.min.js'></script>
+<script src="./js/snap.svg-min.js"></script>
+
+<script >
+$(function() {
+	var t = $("#textEditor");
+	var g = $("#myCanvas");
+	var n = $("#no");
+	console.log("here: ",t, t.attr("value"));
+});
+</script>
+	</head>
+	<body >
+	<svg  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="p1" width="700" height="500" >
+	<style>
+.highlighter {
+	fill:none;stroke:yellow;stroke-width:15 ; opacity:0.7
+}
+
+</style>
+	<g id="myCanvas">
+		<g id="oriPic">
+				<image x="0" y="0" id="c" width="1" height="1" xlink:href=""></image>
+				<!--<image x="0" y="0" id="d" width="300" height="300" xlink:href="../img/test.png" ></image> -->
+				<text x="0" y="15" contentEditable="true">I love SVG!</text>
+				</g>
+				<g id="modifier">
+							
+				</g>
+		<foreignObject x="50" y="50" width="200" height="150">      
+					<input type="text" id="textEditor" value="test here"/>
+		</foreignObject>
+    
+		
+	</g>
+	</svg>
+	
+		
+	</body>
+</html>
