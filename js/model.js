@@ -8,8 +8,8 @@
  var SSElement = {
 	name:"SSElement", 
 	init : function(paper) {
-		 $.extend(this,paper.g());
-		
+		console.log(paper);
+		 $.extend(this,paper.g());		
 		return this;
 	},
 	test: function(){
@@ -166,6 +166,7 @@
 	},
 	highlight : function (x,y,hid,x0,y0) {		
 		if (!hid) {
+			
 			var highlighter = SSHighligher.init(this);			
 			highlighter.draw(x,y,x,y,this.genID(SSHighligher.identifier)); 
 			return highlighter ; 
@@ -251,6 +252,20 @@
  }
  ;//end of SSPainter
  
+  /*
+ *  Class SSPainterItem
+ */
+ var SSPainterItem = {
+	painter:"",
+	init : function(painter) {
+	//	console.log(paper);
+	//	 $.extend(this,paper.g());		
+		this.painter = painter; 
+		return this;
+	}
+ }
+  ;//end of SSPainterItem
+ 
  /*
  *  Class SSPaintBox
  */
@@ -276,7 +291,7 @@
  var SSPath = {
 	id:"",
 	draw: function (x,y,x1,y1,pid) {			
-		var path = this.path(this.genPath(x,y,x1,y1));
+		var path = this.painter.path(this.genPath(x,y,x1,y1));
 		path.attr ({
 			class:this.cssClass,
 			id:pid
@@ -289,7 +304,7 @@
 	
  }
   //Extend class here
- $.extend(true,SSPath,SSElement);
+ $.extend(true,SSPath,SSPainterItem);
   ;//end of SSPath
  
  
@@ -325,16 +340,16 @@
 	id:"",
 	cssClass:"textselect",
 	write: function (x,y,text,tid) {			
-		var txt = this.text(x,y,text);
+		var txt = this.painter.g().text(x,y,text);
 		txt.attr ({
 			class:this.cssClass,
 			id:tid
 		});
 		this.id = tid;
-		this.bindEvent();
+		this.bindEvent(txt);
 	},
-	bindEvent : function() {
-		this.click(evtTextClick);
+	bindEvent : function(txt) {
+		txt.click(evtTextClick);
 	},
 	showEditor(x,y) {
 		var foVal = '<foreignObject width="200" height="150"><input type="text" id="textEditor" value=""/></foreignObject>';
@@ -347,9 +362,8 @@
 		});
 		var input = fo.select("input");
 		$(input.node).blur(evtTextEditorBlur);
-		
-		
-		this.append(fo);
+		$(input.node).keyup(evtTextEditorKeyup);		
+		this.painter.append(fo);
 		//input.node.on("blur",evtTextEditorBlur);
 		input.node.focus();
 		
@@ -359,7 +373,7 @@
 	
  }
   //Extend class here
- $.extend(true,SSText,SSElement);
+ $.extend(true,SSText,SSPainterItem);
   ;//end of SSText
  
    /*

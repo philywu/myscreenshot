@@ -244,16 +244,23 @@ evtImgDblClick = function(event) {
 	//var g = this.parent();
 	var input = $(this);
 	var fo = input.parent();
-	var g = fo.parent(); // the g of foreign object
-	var pg = g.parent();
+	//var g = fo.parent(); // the g of foreign object
+	var pg = fo.parent();
+	//var ppg = this.parent;
 	var painter = SSPainter.getPainter(pg);		
 	var x = fo.attr("x");
 	var y = fo.attr("y");
-	
-	y = parseInt(y) + 15 ; //adjust the position
-	console.log(x,y);
+	console.log(pg,input);
+	y = parseInt(y) + 15 ; //adjust the position	
 	painter.writeText(x,y,this.value);
-	g.remove();
+	fo.remove();
 	
 	
+ }
+ evtTextEditorKeyup = function(evt) {
+	var charCode = (evt.which) ? evt.which : evt.keyCode
+	if (charCode == 13) { // pressed 'enter'
+		console.log("text key ",this);
+		this.blur();
+	}
  }
