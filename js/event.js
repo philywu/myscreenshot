@@ -13,20 +13,15 @@ evtImgSelect = function(evt){
 	var ele1 = SSImage.getElement(g);
 	ele1.bringFront(g);
 	console.log("select: " ,selected);
+	ele1.clearAllSelection();
 	if (!selected) {
-		// add rectangle					
-			ele1.clearAllSelection();
+		// add rectangle								
 			ele1.addImgSelection();
 			g.data("selected",true);
 			//this.drag(evtImgDragMove,evtImgDragStart,evtImgDragEnd);
-	} else {
-	/*d
-		if (!dragged) {			
-			ele1.clearAllSelection();
-			this.undrag();
-		} 
-		*/
-	}
+	} 
+	
+	
 	
 };
 evtImgDragStart = function () {
@@ -237,7 +232,12 @@ evtImgDblClick = function(event) {
  }
  //event Text
  evtTextClick = function(evt) {
-	console.log("text click");
+	evt.stopImmediatePropagation();
+	console.log("text click",this);
+	this.attr( {
+		class:"textselect"
+	}
+	);
  }
  evtTextEditorBlur = function(evt) {
 	console.log("text blur");
@@ -264,3 +264,5 @@ evtImgDblClick = function(event) {
 		this.blur();
 	}
  }
+ 
+ 

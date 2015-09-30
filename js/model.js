@@ -37,13 +37,16 @@
 			ele.remove();
 		});
 		
-
+		this.clearPainterSelection();
 	},	
 	bringFront: function(g) {		
 		var cvs = g.parent();
 		g.remove();
 		cvs.add(g);
 	},
+	clearPainterSelection() {
+		SSText.clearTextSelection();
+	}
 	
  };//end of SSElement
  
@@ -338,7 +341,8 @@
  var SSText = {
 	identifier :"T",
 	id:"",
-	cssClass:"textselect",
+	cssClass:"textnode",
+	cssSelectClass:"textselect",
 	write: function (x,y,text,tid) {			
 		var txt = this.painter.g().text(x,y,text);
 		txt.attr ({
@@ -349,7 +353,7 @@
 		this.bindEvent(txt);
 	},
 	bindEvent : function(txt) {
-		txt.click(evtTextClick);
+		txt.click(evtTextClick);		
 	},
 	showEditor(x,y) {
 		var foVal = '<foreignObject width="200" height="150"><input type="text" id="textEditor" value=""/></foreignObject>';
@@ -368,6 +372,17 @@
 		input.node.focus();
 		
 		//console.log(fo,input);
+	},	
+	clearTextSelection() {
+		var sel = Snap.selectAll("."+this.cssSelectClass);
+		sel.forEach(function(ele){
+			//clear element selection
+			console.log(ele);
+			ele.attr({
+			"class":SSText.cssClass
+			});			
+			
+		});
 	}
 	
 	
